@@ -14,6 +14,8 @@ const initialState: Cart = {
   deliveryDateIndex: undefined,
 }
 
+
+
 interface CartState {
   cart: Cart
   addItem: (item: OrderItem, quantity: number) => Promise<string>

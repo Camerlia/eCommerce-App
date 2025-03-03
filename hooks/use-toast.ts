@@ -1,13 +1,6 @@
-// hooks/use-toast.ts
-
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 
 type ToastVariant = 'default' | 'destructive';
-
-interface ToastAction {
-  label: string;
-  onClick: () => void;
-}
 
 interface Toast {
   id: string;
@@ -36,11 +29,6 @@ export function useToast() {
       const id = generateUniqueId();
       const newToast: Toast = { id, variant, title, description, action, duration };
       setToasts((prevToasts) => [...prevToasts, newToast]);
-
-      // Automatically remove the toast after the specified duration
-      setTimeout(() => {
-        setToasts((prevToasts) => prevToasts.filter((t) => t.id !== id));
-      }, duration);
     },
     []
   );
@@ -48,6 +36,23 @@ export function useToast() {
   const dismissToast = useCallback((id: string) => {
     setToasts((prevToasts) => prevToasts.filter((t) => t.id !== id));
   }, []);
+
+  useEffect(() => {
+    const timeouts: Record<string, ReturnType<typeof setTimeout>> = {};
+
+    toasts.forEach((toast) => {
+      if (toast.duration && !timeouts[toast.id]) {
+        timeouts[toast.id] = setTimeout(() => {
+          dismissToast(toast.id);
+          delete timeouts[toast.id];
+        }, toast.duration);
+      }
+    });
+
+    return () => {
+      Object.values(timeouts).forEach(clearTimeout);
+    };
+  }, [toasts, dismissToast]);
 
   return {
     toasts,

@@ -14,6 +14,8 @@ import BrowsingHistoryList from "@/components/shared/browsing-history-list";
 import AddToCart from "@/components/shared/product/add-to-cart";
 import { generateId, round2 } from "@/lib/utils";
 
+
+
 export async function generateMetadata(props: {
   params: Promise<{ slug: string }>;
 }) {
